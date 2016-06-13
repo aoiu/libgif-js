@@ -515,6 +515,7 @@
             options.auto_play = (!gif.getAttribute('rel:auto_play') || gif.getAttribute('rel:auto_play') == '1');
 
         var onEndListener = (options.hasOwnProperty('on_end') ? options.on_end : null);
+        var onChangeListener = (options.hasOwnProperty('on_change') ? options.on_change : null);
         var loopDelay = (options.hasOwnProperty('loop_delay') ? options.loop_delay : 0);
         var overrideLoopMode = (options.hasOwnProperty('loop_mode') ? options.loop_mode : 'auto');
         var drawWhileLoading = (options.hasOwnProperty('draw_while_loading') ? options.draw_while_loading : true);
@@ -823,6 +824,8 @@
                 tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
                 ctx.globalCompositeOperation = "copy";
                 ctx.drawImage(tmpCanvas, 0, 0);
+                if (typeof onChangeListener === 'function')
+                    onChangeListener(i);
             };
 
             var play = function () {
@@ -927,11 +930,11 @@
             div.className = 'jsgif';
             toolbar.className = 'jsgif_toolbar';
             div.appendChild(canvas);
-            div.appendChild(toolbar);
+            // div.appendChild(toolbar);
 
             if (parent) {
                 parent.insertBefore(div, gif);
-                parent.removeChild(gif);
+                // parent.removeChild(gif);
             }
 
             if (options.c_w && options.c_h) setSizes(options.c_w, options.c_h);
@@ -1047,5 +1050,3 @@
 
     return SuperGif;
 }));
-
-
