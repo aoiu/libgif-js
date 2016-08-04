@@ -31,6 +31,7 @@
 		loop_delay			Optional. The amount of time to pause (in ms) after each single loop (iteration).
 		draw_while_loading	Optional. Determines whether the gif will be drawn to the canvas whilst it is loaded.
 		show_progress_bar	Optional. Only applies when draw_while_loading is set to true.
+		speed     		Optional. The speed multiple when playing
 
 	Instance methods
 
@@ -43,6 +44,7 @@
 		pause -				Stop playing the gif
 		move_to(i) -		Move to frame i of the gif
 		move_relative(i) -	Move i frames ahead (or behind if i < 0)
+    		set_speed(speed) - 	Set the speed multiple
 
 		// getters
 		get_canvas			The canvas element that the gif is playing in. Handy for assigning event handlers to.
@@ -51,6 +53,7 @@
 		get_auto_play		Whether or not the gif is set to play automatically
 		get_length			The number of frames in the gif
 		get_current_frame	The index of the currently displayed frame of the gif
+		get_speed       	Get the speed multiple of playing
 
 		For additional customization (viewport inside iframe) these params may be passed:
 		c_w, c_h - width and height of canvas
@@ -523,6 +526,7 @@
         var progressBarHeight = (options.hasOwnProperty('progressbar_height') ? options.progressbar_height : 25);
         var progressBarBackgroundColor = (options.hasOwnProperty('progressbar_background_color') ? options.progressbar_background_color : 'rgba(255,255,255,0.4)');
         var progressBarForegroundColor = (options.hasOwnProperty('progressbar_foreground_color') ? options.progressbar_foreground_color : 'rgba(255,0,22,.8)');
+        var speedMutiple = (options.hasOwnProperty('speed') ? options.speed : 1);
 
         var clear = function () {
             transparency = null;
@@ -790,7 +794,7 @@
                     if (!stepping) return;
 
                     stepFrame(1);
-                    var delay = frames[i].delay * 10;
+                    var delay = frames[i].delay * 10 / speedMutiple;
                     if (!delay) delay = 100; // FIXME: Should this even default at all? What should it be?
 
                     var nextFrameNo = getNextFrameNo();
@@ -859,6 +863,9 @@
                 pause: pause,
                 playing: playing,
                 move_relative: stepFrame,
+                set_speed: function (speed) {
+                  speedMutiple = speed
+                },
                 current_frame: function() { return i; },
                 length: function() { return frames.length },
                 move_to: function ( frame_idx ) {
@@ -978,6 +985,7 @@
             pause: player.pause,
             move_relative: player.move_relative,
             move_to: player.move_to,
+            set_speed: player.set_speed,
 
             // getters for instance vars
             get_playing      : function() { return playing },
@@ -987,6 +995,7 @@
             get_auto_play    : function() { return options.auto_play },
             get_length       : function() { return player.length() },
             get_current_frame: function() { return player.current_frame() },
+            get_speed        : function() { return speedMutiple },
             get_frame        : function(i) { return frames[i]; },
             load_url: function(src,callback){
                 if (!load_setup(callback)) return;
